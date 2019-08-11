@@ -1,3 +1,5 @@
+Sys.unsetenv("http_proxy")
+Sys.unsetenv("https_proxy")
 
 # Read data from clipboard - Another neat way to import data
 # Copy the data from excel before executing below code
