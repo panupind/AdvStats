@@ -1,6 +1,9 @@
 library(psych)
 library(car)
 
+Sys.unsetenv("http_proxy")
+Sys.unsetenv("https_proxy")
+
 install.packages("psych")
 
 ## Summary Statistics
