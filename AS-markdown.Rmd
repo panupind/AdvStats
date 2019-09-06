@@ -1,0 +1,189 @@
+---
+title: "An Illustrative Case Study on ANOVA"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+library(rmarkdown)
+library(ggplot2)
+library(MASS)
+
+library(multcomp)
+library(Rcmdr)
+```
+
+## ANOVA 
+
+```{r}
+
+setwd("E:/Gunjan/Office/Advance statistics/ANOVA")
+
+aovData<-read.csv("AOVData.csv", header = TRUE)
+
+dim(aovData)
+
+attach(aovData)
+
+head(aovData,6)
+
+summary(co_emissions)
+
+ggplot(data = aovData, aes(x = "", y = co_emissions)) + 
+  geom_boxplot(fill='#A4A4A4', color="black") +
+  coord_cartesian(ylim = c(140,600))
+
+sq <- seq(160, 560, 20)
+hist(co_emissions, breaks=sq)
+
+```
+
+
+```{r}
+
+table(fuel_type)
+
+
+mean(co_emissions)
+
+round(tapply(co_emissions, fuel_type, mean),2)
+
+table(manufacturer)
+
+round(tapply(co_emissions, manufacturer, mean),2)
+
+ggplot(aovData, aes(x = fuel_type, y = co_emissions,color=fuel_type)) +
+  geom_boxplot() +
+  scale_x_discrete() + xlab("Treatment Group") +
+  ylab("Carbon emission")
+
+
+
+```
+
+
+```{r}
+#Aussmption
+
+
+shapiro.test(co_emissions)
+
+## Assumption 3: Levene Test: Homogeneity of Variance
+
+leveneTest(co_emissions ~ fuel_type, aovData)
+
+
+```
+
+
+
+```{r}
+
+## One way test
+
+aovOutput = aov(co_emissions ~ fuel_type, data=aovData)
+summary(aovOutput)
+
+plot(aovOutput)
+  
+## post hoc test
+
+### Tukey Test
+
+posthoc <- TukeyHSD(x=aovOutput,  conf.level=0.95)
+
+round(posthoc$fuel_type,2)
+
+#for family wise comparison
+
+par(oma=c(0,7,0,0)) # adjust the margins because the factor names are long
+plot(posthoc,las=1, col = "red")
+
+
+
+
+```
+
+```{r}
+
+#leveneTest(co_emissions ~ manufacturer, aovData)
+
+ggplot(aovData, aes(x = manufacturer, y = co_emissions,color=manufacturer)) +
+  geom_boxplot() +
+  scale_x_discrete() + xlab("Treatment Group") +
+  ylab("Carbon emission")
+
+aovOutput_m = aov(co_emissions ~ manufacturer, data=aovData)
+summary(aovOutput_m)
+
+plot(aovOutput_m)
+
+posthoc_m <- TukeyHSD(x=aovOutput_m,  conf.level=0.95)
+
+round(posthoc_m$manufacturer,2)
+
+
+par(oma=c(0,5,0,0)) # adjust the margins because the factor names are long
+plot(posthoc_m,las=1, col = "red")
+
+
+
+```
+
+
+
+```{r}
+
+
+ggplot(aovData, aes(x = fuel_type, y = co_emissions,fill=manufacturer)) +  geom_boxplot() 
+ 
+interaction.plot(x.factor = fuel_type, trace.factor = manufacturer, 
+                 response = co_emissions, fun = mean,
+                 type = "b", legend = TRUE,
+                 xlab = "Fuel Type", ylab="Carbon Emission",
+                 pch=c(1,19), col = c("#FF0000", "#228B22")) 
+
+```
+
+```{r}
+
+
+table(fuel_type, manufacturer)
+
+with(aovData, round(tapply(co_emissions, list(fuel_type,manufacturer), mean),2) )
+
+
+shapiro.test(co_emissions)
+
+aov2Output <- aov(co_emissions ~ fuel_type*manufacturer, data = aovData)
+summary(aov2Output)
+
+plot(aov2Output)
+
+model.tables(aov2Output, type="means")
+
+###  Posthoc test
+
+posthoc2<- TukeyHSD(aov2Output)
+
+round(posthoc2$fuel_type,2)
+
+round(posthoc2$manufacturer,2)
+
+round(posthoc2$`fuel_type:manufacturer`,2)
+
+plot(posthoc2)
+
+par(oma=c(1,3,1,1))   # adjust the margins because the factor names are long
+plot(posthoc2,las=1, col = "red", cex.axis = 0.4) 
+
+
+
+
+```
+
+
+

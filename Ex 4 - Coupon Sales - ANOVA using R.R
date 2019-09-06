@@ -124,6 +124,9 @@ summary(aov1)
 aov1 <- aov(df$sales~df$coupon*df$promotion)
 
 summary(aov1)
+TukeyHSD(aov1)
+plot(TukeyHSD(aov1))
+
 
 # Without Interaction = similar to 2 One way ANOVA
 aov1 <- aov(df$sales~df$coupon+df$promotion)
