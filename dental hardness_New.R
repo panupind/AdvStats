@@ -1,16 +1,9 @@
-Sys.unsetenv("http_proxy")
-Sys.unsetenv("https_proxy")
-
-Sys.setenv( http_proxy = "www-proxy.us.oracle.com:80")
-Sys.setenv( https_proxy = "www-proxy.us.oracle.com:80")
 
 # Read data from clipboard - Another neat way to import data
 # Copy the data from excel before executing below code
 
 my_data <- read.table(file = "clipboard", 
                       sep = "\t", header=TRUE)
-
-my_data <- df_dental
 
 # Clearly identify the factors in the data
 my_data$dentist<-factor(my_data$dentist)
@@ -56,11 +49,8 @@ kruskal.test(my_data$hardness~my_data$temperature)
 
 
 ############################################################
-mean(my_data$hardness)
-sd(my_data$hardness)
 
 t.test(my_data$hardness, mu=720, alternative="t", conf.level=0.95)
-
 
 wilcox.test(my_data$hardness, mu=720)
 
@@ -89,30 +79,8 @@ wilcox.test(my_data[my_data$alloy==1,]$hardness,my_data[my_data$alloy==2,]$hardn
 # n = 45
 # delta = xbar1-vbar2 = -68.58
 #sd = pooledSD between group1 and group2
-
-xbar1 <- mean(my_data[my_data$alloy==1,]$hardness)
-xbar1
-xbar2 <- mean(my_data[my_data$alloy==2,]$hardness)
-xbar2
-xbar1 - xbar2
-n1 = n2 = 45
-n1
-n2  
-
-# myPooledVarience <-  ( ( (n1-1)s1^2 ) +  ( (n2 -1)*S2^2  )  / n1+n2 -2)
-# myPooledSD <-  sqrt( ( (n1-1)s1^2 ) +  ( (n2 -1)*S2^2  )  / n1+n2 -2)
-
-VarPooledSD <-  ( (n1-1) * (xbar1 * xbar1) ) +  ( (n2 -1)* ( xbar2 * xbar2 )  )  / (n1+n2 -2 )
-myPooledSD <- (VarPooledSD)^0.5
-myPooledSD
-
-sqrt(14688.12)
-sqrt(25886.43)
-
 pooledSD <- (((45-1)*(14688.12)+(45-1)*(25886.43))/(45+45-2))^0.5
 pooledSD
-xbar1^2
-xbar2^2
 
 power.t.test(n=45,delta=-68.58,sd=142.4334, alternative="two.sided",sig.level=0.05)
 
