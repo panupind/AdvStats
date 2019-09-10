@@ -64,6 +64,22 @@ t.test(my_data$hardness, mu=720, alternative="t", conf.level=0.95)
 
 wilcox.test(my_data$hardness, mu=720)
 
+# compute normality and equality of variences based on alloy
+
+hist(my_data[my_data$alloy==1,]$hardness)
+hist(my_data[my_data$alloy==2,]$hardness)
+
+shapiro.test(my_data[my_data$alloy==1,]$hardness)$p.value
+shapiro.test(my_data[my_data$alloy==2,]$hardness)$p.value
+
+# Since p-value is low  for alloy groups of both , the null Hypothesis is rejected
+# which the distribution of data for each of the groups of alloys do not follow ND
+
+leveneTest(my_data$hardness ~ my_data$alloy)
+
+# p-value is > 0.05 , do not reject null hypothesis
+# the variances of the groups can be assumed as equal
+
 # n = 90
 # delta = xbar-mu = 720 - 741.7778 = -21.7778
 #sd = 145.7678
