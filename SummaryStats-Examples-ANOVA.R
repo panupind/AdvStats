@@ -47,7 +47,7 @@ FSTATCars1 <- MSReg / MSError
 FSTATCars1
 
 
-qf(0.95,5,65)
+qf(0.95,4,60)
 
 qf(0.99,8,29)
 
@@ -55,4 +55,3 @@ qf(0.99,8,29)
 qf(0.95,3,16)
 
 
-df()
