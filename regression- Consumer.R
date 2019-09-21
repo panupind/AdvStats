@@ -74,8 +74,9 @@ ConsumerReg <- cbind(Consumer, fit3, res3)
 
 ##Plot the actual versus fitted values in a plot
 with(ConsumerReg, plot(fit3,res3, pch=19, cex=0.6))
+with(ConsumerReg, lines(fit3,res3, pch=19, cex=0.6))
 with(ConsumerReg, plot(fit3, pch=19, cex=0.6 , col = "Red"))
-with(ConsumerReg, plot(res3, pch=19, cex=0.6 , col = "Blue"))
+with(ConsumerReg, plot(res3, pch=19, cex=0.6 , col = "Blue") , add.scatter)
 
 abline(a=0,b=0)
 
