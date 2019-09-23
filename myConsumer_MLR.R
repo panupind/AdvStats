@@ -15,5 +15,6 @@ BackTrack
 plot(actual_mdl, col="Red")
 lines(predict_mdl, col="Red")
 plot(predict_mdl, col="Blue")
+lines(predict_mdl, col="Red")
 lines(actual_mdl, col="Blue")
 

@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+names(agent_ds)
+attach(agent_ds)
+agent_ds<- agent_ds[,2:8]
+names(agent_ds)
+```
+
+```{r}
+library(psych)
+library(nFactors)
+```
+
+```{r}
+cor(agent_ds)
+ev<- eigen(cor(agent_ds))
+ev$values
+cor(Education, IQScore)
+```
+```{r}
+my_factors <- c(1,2,3,4,5,6,7)
+my_scree <- data.frame(my_factors, ev$values)
+plot(my_scree,col="Blue",ylim = c(0,4))
+lines(my_scree,col="Red")
+
+```
+```{r}
+unrotate <- principal(cor(agent_ds) , nfactors = 3 , rotate = "none")
+unrotate
+print(unrotate , digits=4)
+print(unrotate$scores)
+unrotatedProfile <- plot(unrotate , row.names(unrotate$loadings))
+rotate <- principal(cor(agent_ds) , nfactors = 3 , rotate="varimax")
+print(rotate , digits = 3)
+rotate$loadings
+loadings(rotate)
+rotatedProfile <- plot(rotate , row.names(rotate$loadings))
+print(rotate$loadings , cutoff = 0.5 , digits = 4 , sort = TRUE)
+```
+```{r}
+rotate$values
+rotate$scores
+```
+```{r}
+library(corrplot)
+library(psych)
+cor(agent_ds)
+corrplot(cor(agent_ds))
+pca_agent <- princomp(agent_ds, scores = TRUE , cor = TRUE)
+summary(pca_agent)
+factors_agent <- loadings(pca_agent)
+factors_agent
+print(factors_agent , digits = 3 ,   sort = TRUE)
+agent_rotate <- varimax(factors_agent)
+agent_rotate
+pca_agent$scores
+pca_agent$scores[,1:3]
+
+```
+```{r}
+#  Plots
+plot(pca_agent, type = "line")
+```
+```{r}
+plot(pca_agent$scores[,1],pca_agent$scores[,2], col = c("Red","Blue"))
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

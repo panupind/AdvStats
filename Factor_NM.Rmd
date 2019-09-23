@@ -1,0 +1,114 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+PCA_nm
+attach(PCA_nm)
+names(PCA_nm)
+PCA_nm <- PCA_nm[,1:6]
+PCA_nm
+PCA_nm <- PCA_nm[-c(31,32,33),]
+names(PCA_nm)
+tail(PCA_nm,10)
+attach(PCA_nm)
+
+```
+```{r paged.print=TRUE}
+library(nFactors)
+library(corrplot)
+
+# Find out of pca can be applied based  on the cor between variables and corrplot
+
+# decide number of fctors by using scree plot
+
+cor(PCA_nm)
+corrplot(cor(PCA_nm))
+```
+
+
+```{r}
+# load necessary packages
+# determine the eigen vectors , eigen values
+library(nFactors)
+library(psych)
+
+ev_dental <- eigen(cor(PCA_nm))
+ev_dental$values
+ev_dental$vectors
+
+```
+
+
+```{r}
+# Determine the factors , and choose appropriate as per scree plot , elbow and Kaizen rules
+factors_dental <- c(1,2,3,4,5,6)
+scree_dental <- data.frame(factors_dental , ev_dental$values) 
+scree_dental
+plot( scree_dental , col ="Blue")
+lines(scree_dental, col ="Red")
+```
+
+
+```{r}
+# Performing  pca using principal function
+# Please  note input of first argument to principal function i.e. "x" can be either a
+# correlation matrrix of the dataframe of original data or the data frame with original data of input variables.
+# If original data frame of input variables is given , correlation is computed.
+# However , if cor(x) is used in  the principal function , pCAresult$scores will yield a result of NULL
+?principal
+punrotate_dental <- principal(PCA_nm, nfactors = 2 , rotate = "none")
+punrotate_dental
+print(punrotate_dental$loadings , cutoff =  0.5 , digits =  4)
+punrotate_dental$values
+punrotate_dental$loadings
+plot(punrotate_dental , row.names(punrotate_dental$loadings))
+
+```
+
+```{r}
+# compute the factor scores using loadings without rotation
+
+factorScores_punrotate_dental <- punrotate_dental$scores
+factorScores_punrotate_dental
+
+```
+```{r}
+
+# rotate the factors and compute the factor scores
+protate_dental <- principal(PCA_nm, nfactors = 2 , rotate = "varimax")
+protate_dental
+protate_dental$values
+protate_dental$loadings
+plot(protate_dental , row.names(protate_dental$loadings))
+
+```
+
+```{r}
+factorScores_protate_dental <-  protate_dental$scores
+factorScores_protate_dental
+```
+
+```{r}
+# Re computing the whole exercise using factanal function than using principle function
+unrotate_dental <- factanal( PCA_nm ,  factors = 2 , rotation = "none") 
+unrotate_dental$loadings
+factor.scores(PCA_nm[,1:6], unrotate_dental$loadings)
+rotate_dental <- factanal( PCA_nm ,  factors = 2 , rotation = "varimax") 
+rotate_dental
+rotate_dental$loadings
+rotate_dental$loadings[,1:2]
+factor.scores(PCA_nm[,1:6], rotate_dental$loadings)
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
