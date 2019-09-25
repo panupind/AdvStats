@@ -51,7 +51,7 @@ print(rotate , digits = 3)
 rotate$loadings
 loadings(rotate)
 rotatedProfile <- plot(rotate , row.names(rotate$loadings))
-print(rotate$loadings , cutoff = 0.5 , digits = 4 , sort = TRUE)
+print(rotate$loadings ,  digits = 4 , sort = TRUE)
 ```
 ```{r}
 rotate$values
