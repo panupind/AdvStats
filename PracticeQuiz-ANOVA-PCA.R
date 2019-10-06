@@ -37,13 +37,15 @@ cor(decathlon2.active)
 evd <- eigen(cor(decathlon2.active))
 evd$values
 
-pcd <- prcomp(decathlon2.active , scale. = FALSE  )
-pcd
+pcd1 <- princomp( decathlon2.active , scores = TRUE , cor = TRUE)
+
+#pcd <- prcomp(decathlon2.active , scale. = FALSE  )
+pcd1
 
 names(decathlon2.active)
-names(pcd)
-summary(pcd)
-pcd$sdev
+names(pcd1)
+summary(pcd1)
+pcd1$sdev
 
 
 8000+6750
@@ -63,4 +65,4 @@ fcrit
 
 qf(0.99,8,29)
 
-qf(0.95,3,36)
+qf(0.95,3)

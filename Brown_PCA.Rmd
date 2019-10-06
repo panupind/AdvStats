@@ -43,6 +43,8 @@ lines(my_scree,col="Red")
 ```{r}
 unrotate <- principal(cor(agent_ds) , nfactors = 3 , rotate = "none")
 unrotate
+names(unrotate)
+cor(unrotate$communality, unrotate$uniquenesses)
 print(unrotate , digits=4)
 print(unrotate$scores)
 unrotatedProfile <- plot(unrotate , row.names(unrotate$loadings))

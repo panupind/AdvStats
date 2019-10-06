@@ -10,9 +10,10 @@ tail(data2)
 data2$X <- NULL
 data2 <- data2[-c(31, 32, 33), ]
 
+
 ##Create a matrix out of the dataframe in order to be used in the Model
 X2 <- as.matrix(data2[, 1:6])
-
+X2
 # Determine Number of Factors to Extract using quantile distribution methods
 install.packages("nFactors")
 
@@ -23,19 +24,24 @@ ev
 
 nS <- nScree(x=ev$values)
 plotnScree(nS)
+X2
+~X2
 
 ##Run factor analysis model with number of factors limit to 2 and no rotation
 Factor <- factanal(~X2, 
                    2, # Specify the number of factors to be extracted
                    rotation="none") # varimax and promax rotations are possible
 Factor
-print(Factor, digits=2, cutoff= .6, sort= TRUE)
+print(Factor, digits=2, cutoff= .6,  sort= TRUE)
+
 
 #Calculate Factor Scores
 library(psych)
 factor.scores(data2[, 1:6],Factor$loadings)
 
 ##Uniqueness is the variance not explained by the 3 factors for each variable
+
+data2
 
 ##View the Factor Loadings
 load <- Factor$loadings[,1:2]
@@ -55,8 +61,8 @@ load1
 
 ##Plot the loadings for Factor 1 and Factor 2
 plot(load1, type= "n")
-text(load1, labels=names(data2), load1=Factor$loadings[,1:2])
-
+text(load1, labels=names(data2), load1=Factor1$loadings[,1:2])
+names(data2)
 
 
 ##Run factanal again with promax rotation just for fun
@@ -65,6 +71,7 @@ Factor2 <- factanal(~X2, 2, rotation="promax")
 ##View Loadings
 load2 <- Factor2$loadings[,1:2]
 load2
+names(data2)
 
 ##Plot the loadings as scatterplot
 plot(load2, type= "n")
