@@ -1,5 +1,10 @@
 ##Upload the csv file into R
+
 data2 <- read.csv(file.choose())
+
+Sys.unsetenv("http_proxy")
+Sys.unsetenv("https_proxy")
+
 
 ##Study the structure of data
 str(data2)
