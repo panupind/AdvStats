@@ -1,0 +1,258 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+  word_document: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+#install necessary publishing packages 
+Sys.unsetenv("http_proxy")
+Sys.unsetenv("https_proxy")
+
+
+#install.packages('tinytex')
+#tinytex::install_tinytex(force = TRUE)
+
+
+#tinytex:::is_tinytex()
+#tinytex::tlmgr_path()
+```
+
+
+```{r}
+library(readr)
+cerealDRO <- read_csv("D:/Prasanna/Personal/Learning/Other Reads/GL/Course Material/Advanced Statistics/DataSets/cereal.csv")
+View(cerealDRO)
+summary(cerealDRO)
+head(cerealDRO)
+tail(cerealDRO)
+# Some data transformations as likert scale exceeds  5 point scale and has a value of 6
+cerealDRO[cerealDRO==6]<- 5
+cerealDRO
+
+
+cerealDR<-cerealDRO[-1]
+
+
+attach(cerealDR)
+
+```
+
+
+```{r paged.print=TRUE}
+
+# perform certain tests on the data to find if 
+# ** Sample is adequate - using KMO test of sample adequecy
+# ** Dimensionality reduction possible - barlett test of Sphericity
+
+library(psych)
+cerealKMO <- KMO(cerealDR)
+cerealKMO
+
+cerealCor <- round(cor(cerealDR),2)
+cerealBartlett <- cortest.bartlett(cerealCor, n = nrow(cerealDRO))
+cerealBartlett
+
+
+```
+
+
+```{r paged.print=TRUE}
+
+library(corrplot)
+
+# Find out of pca can be applied based  on the cor between variables and corrplot
+
+# decide number of fctors by using scree plot
+names(cerealDR)
+
+cor(cerealDR)
+corrplot(cor(cerealDR[,1:25]))
+```
+
+
+```{r}
+
+# determine the eigen vectors , eigen values for factanal 
+
+
+ev_cereal <- eigen(cor(cerealDR))
+ev_cereal$values
+ev_cereal$vectors
+
+```
+
+
+```{r}
+# Determine the factors , and choose appropriate as per scree plot , elbow and Kaizen rules
+library(nFactors)
+library(lattice)
+library(latticeExtra)
+
+?parallel
+
+factors_cereal <- c(1:25)
+scree_cereal <- data.frame(factors_cereal , ev_cereal$values) 
+scree_cereal
+plot( scree_cereal , col ="Blue")
+lines(scree_cereal, col ="Red")
+
+#parallel_cereal <- fa.parallel(cerealDR , fm="ml",fa="fa")
+
+parallel_cereal  <- parallel(nrow(cerealDR), ncol(cerealDR),  rep =  100 , cent = 0.05 )
+
+ns_cereal <- nScree(x = ev_cereal$values,aparallel = parallel_cereal$eigen$qevpea )
+plotnScree(ns_cereal)
+```
+
+
+```{r}
+# Performing  Factor analysis  using factanal  function
+
+set.seed(100)
+library(nFactors)
+
+punrotate_cereal <- factanal( x = cerealDR, factors = 4 , rotation = "none")
+
+print(punrotate_cereal , digits = 3 , cutoff = 0.4 , sort = TRUE)
+
+```
+
+
+```{r}
+# plot the results of factor analysis to determine grouping of factors and name 
+# current weightage of factors without rotation doesnt not help in identifying the names for the columns
+ucr_load <- punrotate_cereal$loadings[,1:2]
+plot(ucr_load  ,  type = "n" ) 
+text(ucr_load  , labels = row.names(ucr_load)) 
+
+```
+
+```{r}
+# compute the factor scores using loadings without rotation
+library(psych)
+
+factorScores_punrotate_cereal <- factor.scores( cerealDR , f = punrotate_cereal$loadings)
+factorScores_punrotate_cereal
+
+```
+```{r}
+# rotate the factors and compute the factor scores to group and name the factors appropriately
+protate_cereal <- factanal( x = cerealDR, factors = 4 , rotation = "varimax")
+
+print(protate_cereal, digits = 3 , cutoff = 0.4 , sort = TRUE)
+
+```
+
+
+```{r}
+# Plot to name the factors
+cr_load <- protate_cereal$loadings[,1:2]
+plot(cr_load  ,  type = "n" ) 
+text(cr_load  , labels = row.names(cr_load))
+
+```
+
+```{r}
+factorScores_protate_cereal <-  factor.scores(cerealDR, protate_cereal$loadings)
+factorScores_protate_cereal
+```
+```{r}
+#Naming the dimensions
+Dimension1 <- colnames(cerealDR[,c(1,2,3,7,8,13,18,22,25)])
+Dimension1
+Dimension2 <- colnames(cerealDR[,c(4,6,19,21)])
+Dimension2
+Dimension3 <- colnames(cerealDR[,c(10,12,14)])
+Dimension3
+Dimension4 <- colnames(cerealDR[,c(5,9,11,16,17,20,23,24)])
+Dimension4 
+
+remove(newcerealDR)
+newcerealDR <- cerealDR
+
+aggDim1 <- apply(newcerealDR[,Dimension1],1, mean)
+aggDim2 <- apply(newcerealDR[,Dimension2],1, mean)
+aggDim3 <-  apply(newcerealDR[,Dimension3],1, mean)
+aggDim4 <-  apply(newcerealDR[,Dimension4],1, mean)
+
+
+
+```
+
+
+```{r}
+newcerealDR[,26] <- round(aggDim1 , digits = 3)
+newcerealDR[,27] <- round(aggDim2 , digits = 3)
+newcerealDR[,28] <- round(aggDim3, digits = 2)
+newcerealDR[,29] <- round(aggDim4 , digits = 2)
+
+colnames(newcerealDR)[26:29] <- c("Health", "Taste", "Family", "Experience")
+print(newcerealDR)
+
+```
+Dimension 1 ==> Signifies Health related parameters
+Dimension 2 ==> Signifies Taste related parameters
+Dimension 3 ==> Signifies Family related parameters
+Dimension 4 ==> Signifies Experience related parameters
+Next step is to add these 4 new Dimensions as columns to the dataset
+
+```{r}
+aggregate(x= newcerealDR[,27:29], by = list(cerealDRO$Cereals) ,  FUN = mean , sort = TRUE)
+
+
+```
+
+
+```{r}
+## Re-computing the whole exercise using principal  function than using factanal function
+
+# Please  note input of first argument to principal function i.e. "x" can be either a
+# correlation matrrix of the dataframe of original data or the data frame with original data of input variables.
+# If original data frame of input variables is given , correlation is computed.
+# However , if cor(x) is used in  the principal function , pCAresult$scores will yield a result of NULL
+
+#factors without rotation
+
+library(psych)
+unrotate_cereal <- principal( cerealDR ,  nfactors = 4 , rotate =  "none") 
+unrotate_cereal
+print(unrotate_cereal$loadings,  sort = TRUE)
+factor.scores(cerealDR, unrotate_cereal$loadings)
+
+# factors after rotation
+
+rotate_cereal <- principal( cerealDR ,  nfactors = 4 , rotate = "varimax") 
+rotate_cereal
+print(rotate_cereal$loadings ,  sort = TRUE)
+
+cat("Fitment : ", rotate_cereal$fit)
+
+
+factor.scores(cerealDR , rotate_cereal$loadings)
+plot(rotate_cereal , row.names(rotate_cereal$loadings))
+
+
+
+
+```
+
+*Based on the analysis from PCA , the fitment of the model is 0.9077224 i.e. 90%.*
+*The root mean square of the residuals (RMSR) is  0.06 which is an indicator of the fit*
+
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
